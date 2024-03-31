@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %} Demo liste déroulante (WTF) {% endblock %}
+{% block body %}
+<div class="container">
+    <h1>Démo d'une liste déroulante (WTForms) sur la table "t_genre".</h1>
+    <p></p>
+    <div class="alert alert-dismissible alert-info">
+        <h4 class="alert-heading">Il ne faut pas utiliser ce système pour les tables intermédiaires avec plusieurs clés étrangères "fk_".</h4>
+    </div>
+
+    <p></p>
+    <br>
+
+    <p>Si dans vos tables de BD, vous avez une clé étrangère, il faut utiliser un type de champ de WTForms "SelectField".<br><br>
+        Exemple : (Voir le MLD ci-dessous) Pour une voiture, selon la carte grise (en Suisse) on a un seul entraînement possible pour une voiture.<br>
+        Donc dans la "t_voiture" on va avoir une "fk_entrainement" reliée à la table entraînement.<br>
+        La table "t_entrainement" dans le champ "nom_entrainement" contient les valeurs ci-dessous :<br>
+        AV = avant<br>
+        AR = arrière<br>
+        4RM = sur toutes les roues<br>
+        C = chenilles<br>
+        TT = tout terrain (déclaration conforme à l’art. 12, al. 3, OETV)<br>
+
+    </p>
+    <p style="text-align:center;"><img src="/static/images/tables_une_fk.jpg" alt="un à plusieurs" /></p>
+
+    <p>
+        C'est une démonstration qu'il faut adapter à votre BD, si vous en avez l'utilité.
+        Le principe de la "liste déroulante" est de proposer un ensemble de valeurs fiables
+        (car basées sur une table) à l'utilisateur,
+        il peut ainsi choisir une(des) valeur(s) parmi l'ensemble affiché dans la liste.
+    </p>
+
+    <p>
+        Pour cet exemple de "liste déroulante" avec WTForms, j'ai laissé mes essais en commentaires.
+        Il y a plusieurs solutions de gérer une liste déroulante.
+        Ce "projet" est un laboratoire, à vous de tenter quelques expériences à partir de ce que j'ai proposé.
+        Il est certain que vous ne pouvez pas tout apprendre avec la seule documentation du site original.
+        <a href="https://wtforms.readthedocs.io/en/2.3.x/fields/" target="_blank">https://wtforms.readthedocs.io/en/2.3.x/fields/</a><br>
+        Il faut chercher sur l'Internet, c'est là que vous apprenez le plus sur les techniques en usage.<br>
+        La curiosité est indispensable, vos découvertes techniques seront fantastiques.
+    </p>
+    <h4>Cette démo</h4>
+    <ul>
+        <li class="list-item">
+            Dans la liste déroulante, il y a un choix imposé par défaut dans le code ligne 96 du fichier "essais_wtf_forms/gestion_wtf_forms_demo_select.py"
+        </li>
+        <li class="list-item">
+            Choisir un autre genre dans la liste.
+        </li>
+        <li class="list-item">
+            Confirmer votre choix par un clic sur le bouton "Choix genre"
+        </li>
+    </ul>
+    <p>
+
+    </p>
+    <form action="" method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.genres_dropdown_wtf.label(class="form-control-label") }}<br>
+            {{ form.genres_dropdown_wtf(class="form-select-sm") }}
+            {% for error in form.genres_dropdown_wtf.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>Genre choisi : {{ form.genres_dropdown_wtf.data }}</p>
+        <p>{{ form.submit_btn_ok_dplist_genre(class="btn btn-primary") }}</p>
+    </form>
+
+
+
+
+    <div class="mb-5">
+        <p class="text-danger">ps : Il est probable que votre concept de BD possède une seule table intermédiaire, celle que JE vous IMPOSE.
+            Mon discours sur le "plusieurs à plusieurs" est un hurlement --> TOUT est "n" à "n" (avec des tables intermédiaires).<br>
+            Mais la "flemmardise minimale" de l'être humain fait qu'il est plus simple de considérer qu'une personne
+            possède une seule adresse "mail", par exemple.
+            Alors que dans ma manière de concevoir les BD, je prétends que chaque personne peut avoir plusieurs adresses "mails". Le monde est pluriel, donc il ne doit y avoir que des concepts de BD "plusieurs à plusieurs" entre les tables.<br>
+            C'est un hymne à l'intégrité référentielle que j'aboie devant vous !!!
+        </p>
+    </div>
+    <p></p>
+    <form action="{{ url_for('demo_select_dropdown_bootstrap') }}" method="POST" novalidate>
+        <select id="essai_dropdown"  name="ma_petite_liste_unique" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+            {% for row in data_genres_drop_down %}
+                <option value="{{ row.id_genre }}">{{ row.intitule_genre }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" value="Submit">Choix</button>
+    </form>
+</div>
+
+{% endblock %}
+
+

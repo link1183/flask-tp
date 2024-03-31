@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<div class="container">
+    <h1>Essai de quelques champs de formulaire avec WTForms</h1>
+    <p></p>
+    <p><li>1er essai : Laisser les champs vides et cliquer sur le bouton Ok !!!</li></p>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.username.label }}<br>
+            {{ form.username(size=15) }}<br>
+            {% for error in form.username.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(size=8) }}<br>
+            {% for error in form.password.errors %}
+                <span style="color: yellow;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.nom_genre_wtf.label }}<br>
+            {{ form.nom_genre_wtf(size=32) }}<br>
+            {% for error in form.nom_genre_wtf.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.case_cocher_npc() }} {{ form.case_cocher_npc.label }}</p>
+        <p>{{ form.submit() }}</p>
+    </form>
+</div>
+
+{% endblock %}
+
+
