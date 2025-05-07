@@ -1,32 +1,32 @@
-# Azure VM Infrastructure Setup (MariaDB + Flask)
+# Module 346 - Mise en place d'une application Flask
 
-## Infrastructure as Code Guide for Azure CLI
+## Introduction
 
-## Overview
+Ce document montre notre approche étape par étape pour préparer le déploiement de l'application Flask dans le Cloud.
 
-This guide provides step-by-step instructions for deploying a two-tier application architecture in Azure (Switzerland North), consisting of a web server and database server with proper network segmentation and security.
+Note : nous avons utilisé le CLI azure pour créer et paramétrer les instances Azure. Vous pouvez suivre [ce lien](https://learn.microsoft.com/en-us/cli/azure/get-started-with-azure-cli) pour télécharger et paramétrer celui-ci.
 
-### Architecture Components
+### Composants de l'architecture
 
-- **Resource Group**: `pc04sej` (pre-created)
+- **Groupe de ressources**: `pc04sej` (pré créé)
 - **Region**: `switzerlandnorth`
-- **Virtual Machines**:
-  - `vm-web`: Flask static file server (public IP)
-  - `vm-db`: MariaDB server (private IP only)
-- **Network Components**:
-  - **VNet**: `vnet-main` (10.10.0.0/16)
+- **Machines virtuelles**:
+  - `vm-web`: Machine virtuelle contenant l'application flask (IP publique)
+  - `vm-db`: Serveur MariaDB (IP privée uniquement)
+- **Composants réseaux**:
+  - **Réseau virtuel**: `vnet-main` (10.10.0.0/16)
   - **Subnets**: `subnet-web` (10.10.1.0/24), `subnet-db` (10.10.2.0/24)
   - **NSGs**: `nsg-web`, `nsg-db`
 - **Authentication**:
-  - **Admin Username**: `azureuser`
-  - **SSH Key**: `~/.ssh/id_ed25519.pub`
+  - **Username admin**: `azureuser`
+  - **Clé SSH**: `~/.ssh/id_ed25519.pub` (doit être présente sur la machine host, ou peut être créée via la commande `ssh-keygen`)
 
 ---
 
-## 1. Network Infrastructure Setup
+## 1. Setup de l'infrastructure réseau
 
 ```bash
-# Create virtual network and web subnet
+# Création du virtual network, ainsi que du subnet utilisé pour le frontend
 az network vnet create \
   --resource-group pc04sej \
   --name vnet-main \
@@ -35,18 +35,18 @@ az network vnet create \
   --subnet-prefix 10.10.1.0/24 \
   --location switzerlandnorth
 
-# Create database subnet
+# Création du subnet utilisé pour la database
 az network vnet subnet create \
   --resource-group pc04sej \
   --vnet-name vnet-main \
   --name subnet-db \
   --address-prefix 10.10.2.0/24
 
-# Create Network Security Groups
+# Création des Network Security Groups
 az network nsg create --resource-group pc04sej --name nsg-web
 az network nsg create --resource-group pc04sej --name nsg-db
 
-# NSG rule: Allow SSH & HTTP to web subnet from internet
+# Autorisation du port SSH et HTTP sur la machine utilisée pour le frontend
 az network nsg rule create \
   --resource-group pc04sej \
   --nsg-name nsg-web \
@@ -58,7 +58,7 @@ az network nsg rule create \
   --source-address-prefix Internet \
   --destination-port-ranges 22 80
 
-# NSG rule: Allow web subnet access to DB subnet (SSH & MariaDB)
+# Autorisation du port SSH et MariaDB sur la machine utilisée pour le backend (uniquement pour les adresses venant du subnet frontend)
 az network nsg rule create \
   --resource-group pc04sej \
   --nsg-name nsg-db \
@@ -70,7 +70,7 @@ az network nsg rule create \
   --source-address-prefix 10.10.1.0/24 \
   --destination-port-ranges 22 3306
 
-# Associate NSGs to subnets
+# Association des NSGs avec les subnets
 az network vnet subnet update \
   --resource-group pc04sej \
   --vnet-name vnet-main \
@@ -84,10 +84,16 @@ az network vnet subnet update \
   --network-security-group nsg-db
 ```
 
-## 2. Virtual Machine Deployment
+## 2. Déploiement des machines virtuelles
 
 ```bash
-# Create web VM (with public IP)
+# Création de l'IP publique utilisée pour la machine virtuelle du frontend
+az network public-ip create \
+  --resource-group pc04sej \
+  --name pip-vm-web \
+  --allocation-method Static
+
+# Création de la VM web (avec une IP publique statique)
 az vm create \
   --resource-group pc04sej \
   --name vm-web \
@@ -99,7 +105,7 @@ az vm create \
   --admin-username azureuser \
   --ssh-key-values ~/.ssh/id_ed25519.pub
 
-# Create DB VM (private IP only)
+# Création de la VM utilisée pour la base de données (avec IP privée uniquement)
 az vm create \
   --resource-group pc04sej \
   --name vm-db \
@@ -112,19 +118,19 @@ az vm create \
   --ssh-key-values ~/.ssh/id_ed25519.pub
 ```
 
-## 3. SSH Access Configuration
+## 3. Accéder aux machines virtuelles via SSH
 
 ```bash
-# Direct SSH to web VM
+# Accès direct à la VM frontend via SSH
 ssh -i ~/.ssh/id_ed25519 azureuser@<web-vm-public-ip>
 
-# SSH to database VM through web VM (jump host)
+# On utilise la VM frontend comme jump host pour accéder à la VM database
 ssh -i ~/.ssh/id_ed25519 -J azureuser@<web-vm-public-ip> azureuser@10.10.2.4
 ```
 
-## 4. Automated VM Backup Solution
+## 4. Backups automatisées
 
-This script creates daily snapshots of VM disks and maintains a 7-day retention policy.
+Ce script crée des snapshots quotidiennes des disques des VM et applique une politique de rétention de 7 jours. Enregistrez ce script avec le nom `snapshot_vms.sh`.
 
 ```bash
 #!/bin/bash
@@ -172,17 +178,15 @@ for SNAPSHOT in $(az snapshot list --resource-group "$RESOURCE_GROUP" --query "[
 done
 ```
 
-### Setting Up Daily Backup Automation
+### Paramétrage d'un backup quotidien
 
 ```bash
-# Make the script executable
 chmod +x snapshot_vms.sh
 
-# Edit crontab to run daily at 2 AM
+# Cronjob se lançant chaque jour, à 2h du matin.
 crontab -e
 
-# Add this line to crontab:
-0 2 * * * /home/agunthe1/scrips/snapshot_vms.sh >> /var/log/azure_snapshot.log 2>&1
+0 2 * * * /path/to/snapshot_vms.sh >> /var/log/azure_snapshot.log 2>&1
 ```
 
 ## 5. Performance Testing with JMeter
