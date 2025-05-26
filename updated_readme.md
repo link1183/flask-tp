@@ -157,7 +157,6 @@ sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
 ```
 
 **Important**: Dans le fichier de configuration, modifiez la ligne `bind-address` :
-
 ```
 bind-address = 0.0.0.0
 ```
@@ -165,7 +164,6 @@ bind-address = 0.0.0.0
 **Mot de passe root MySQL** : `WidmerForLife`
 
 Après la configuration, redémarrez le service MySQL :
-
 ```bash
 sudo systemctl restart mysql
 ```
@@ -192,7 +190,6 @@ nano .env
 ```
 
 **Contenu du fichier `.env`** :
-
 ```
 HOST_MYSQL=10.10.2.4
 USER_MYSQL=admin
