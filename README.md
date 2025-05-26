@@ -6,6 +6,12 @@ Ce document montre notre approche étape par étape pour préparer le déploieme
 
 Note : nous avons utilisé le CLI azure pour créer et paramétrer les instances Azure. Vous pouvez suivre [ce lien](https://learn.microsoft.com/en-us/cli/azure/get-started-with-azure-cli) pour télécharger et paramétrer celui-ci.
 
+## Auteurs
+
+Ce TP a été réalisé par Adrien Gunther et Thomas Burkhalter.
+
+Le résultat final du TP est accessible à l'adresse `http://172.161.93.163`.
+
 ### Composants de l'architecture
 
 - **Groupe de ressources**: `pc04sej` (pré créé)
@@ -20,6 +26,10 @@ Note : nous avons utilisé le CLI azure pour créer et paramétrer les instances
 - **Authentication**:
   - **Username admin**: `azureuser`
   - **Clé SSH**: `~/.ssh/id_ed25519.pub` (doit être présente sur la machine host, ou peut être créée via la commande `ssh-keygen`)
+
+Schéma :
+
+![Schéma réseau](./assets/Schéma.png)
 
 ---
 
