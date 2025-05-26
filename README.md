@@ -189,32 +189,15 @@ crontab -e
 0 2 * * * /path/to/snapshot_vms.sh >> /var/log/azure_snapshot.log 2>&1
 ```
 
-## 5. Performance Testing with JMeter
+## 5. Preuve de fonctionnement du site
 
-1. Download and install [Apache JMeter](https://jmeter.apache.org/)
-2. Create a test plan (`testplan.jmx`) with HTTP Requests targeting `http://<vm-web-public-ip>/`
-3. Run tests in non-GUI mode for better performance:
+![Preuve de fonctionnement du site](./assets/preuve_1.png)
+![Preuve de fonctionnement du site](./assets/preuve_2.png)
 
-```bash
-jmeter -n -t testplan.jmx -l results.jtl -e -o jmeter-report
-```
+## 6. Analyse des performances JMeter
 
-4. View detailed analysis by opening `jmeter-report/index.html` in your browser
+Une analyse détaillée des performances JMeter se trouve dans le fichier `Analyse_JMeter.pdf`.
 
-## 6. Cost Analysis
+## 7. Facturation
 
-Estimated monthly cost breakdown for the infrastructure in Switzerland North region:
-
-| Resource                         | Specification                         | Quantity | Price/Unit/Month | Monthly Cost (CHF) |
-| -------------------------------- | ------------------------------------- | -------- | ---------------- | ------------------ |
-| Virtual Machines                 | Standard_B1ms (1 vCPU, 2 GB RAM)      | 2        | CHF 19.27        | CHF 38.54          |
-| Managed Disks                    | P4 Premium SSD (32 GB)                | 2        | CHF 6.39         | CHF 12.78          |
-| Public IP Address                | Static                                | 1        | CHF 2.63         | CHF 2.63           |
-| VNet                             | Data transfer (<100 GB)               | 1        | Free             | CHF 0.00           |
-| Snapshots                        | Standard LRS (32 GB × 7 days × 2 VMs) | ~448 GB  | CHF 0.0235/GB    | CHF 10.528         |
-| **Total Estimated Monthly Cost** |                                       |          |                  | **CHF 64.48**      |
-
-> **Notes**:
->
-> - Prices shown in Swiss Francs (CHF) for Switzerland North region
-> - Actual costs may vary based on Azure pricing changes and actual resource utilization
+Une facturation est disponible dans le fichier `Facture_Adromas.pdf`
