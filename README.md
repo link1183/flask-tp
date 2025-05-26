@@ -313,3 +313,11 @@ Une analyse détaillée des performances JMeter se trouve dans le fichier `Analy
 ## 10. Facturation
 
 Une facturation est disponible dans le fichier `Facture_Adromas.pdf`
+
+## 11. Problèmes rencontrés
+
+Le problème principal a été que la création d'une VM via le CLI azure créé un NSG pour cette VM. Nos règles sur les NSG ne fonctionnaient alors pas, parce qu'un autre NSG bloquait leur exécution. Ce problème a été réglé en supprimant les NSG non nécessaires depuis le GUI azure.
+
+## 12. Conclusion
+
+Dans ce TP, nous avons déployé avec succès une infrastructure pour une application. Nous pourrions cependant le refaire beaucoup plus facilement en utilisant un déploiement via Docker ou Kubernetes, qui nous permettrait de déployer toute l'application avec une seule commande, au lieu du grand nombre de commande nécessaire à l'installation de l'application et au setup de la base de données. Ceci nous permettrait également d'éliminer 1 des 2 VMs, ce qui réduirait grandement le coût final.
